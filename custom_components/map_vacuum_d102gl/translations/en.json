@@ -1,0 +1,115 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Xiaomi account",
+        "description": "Sign in with your Mi Home account. The map is downloaded from the Xiaomi cloud.",
+        "data": {
+          "username": "Username (e-mail, phone number or user ID)",
+          "password": "Password",
+          "server": "Server"
+        }
+      },
+      "captcha": {
+        "title": "Captcha",
+        "description": "Xiaomi requires a captcha. Type the characters shown in the image.\n\n![Captcha](data:image/png;base64,{captcha_image})",
+        "data": {
+          "code": "Captcha code"
+        }
+      },
+      "two_factor": {
+        "title": "Two-step verification",
+        "description": "Xiaomi sent a verification code to your e-mail address. If you did not receive it, open {url} in a browser, complete the verification and try again.",
+        "data": {
+          "code": "Verification code"
+        }
+      },
+      "device": {
+        "title": "Select the robot",
+        "description": "Choose the robot vacuum. Commands are sent locally when the IP address and token are known, the map itself is always downloaded from the cloud.",
+        "data": {
+          "device_id": "Robot",
+          "host": "Local IP address (optional, taken from the cloud if empty)",
+          "use_local": "Send commands locally when possible"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authentication",
+        "description": "Enter the password of {username} again.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid username or password",
+      "cannot_connect": "Cannot reach the Xiaomi cloud",
+      "invalid_captcha": "Invalid captcha, try again",
+      "invalid_code": "Invalid or expired verification code",
+      "unknown": "Unexpected error, see the logs"
+    },
+    "abort": {
+      "already_configured": "This robot is already configured",
+      "no_devices": "No supported robot vacuum was found on this account",
+      "cannot_connect": "Cannot reach the Xiaomi cloud",
+      "reauth_successful": "Re-authentication successful"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Map options",
+        "data": {
+          "refresh_seconds": "Refresh interval",
+          "scale": "Image scale",
+          "rotate": "Image rotation",
+          "use_local": "Send commands locally when possible",
+          "api": "Vendor API"
+        }
+      }
+    }
+  },
+  "selector": {
+    "server": {
+      "options": {
+        "auto": "Automatic (search all servers)",
+        "cn": "China (cn)",
+        "de": "Europe (de)",
+        "us": "United States (us)",
+        "ru": "Russia (ru)",
+        "tw": "Taiwan (tw)",
+        "sg": "Singapore (sg)",
+        "in": "India (in)",
+        "i2": "India 2 (i2)"
+      }
+    },
+    "api": {
+      "options": {
+        "auto": "Automatic (from model)",
+        "roborock": "Roborock / Mi Robot",
+        "dreame": "Dreame",
+        "viomi": "Viomi",
+        "roidmi": "Roidmi",
+        "ijai": "Ijai",
+        "xiaomi": "Xiaomi (xiaomi.vacuum.*)"
+      }
+    }
+  },
+  "entity": {
+    "camera": {
+      "map": {
+        "name": "Map"
+      }
+    },
+    "image": {
+      "map": {
+        "name": "Map"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh map"
+      }
+    }
+  }
+}

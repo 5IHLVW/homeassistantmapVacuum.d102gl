@@ -1,0 +1,115 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Compte Xiaomi",
+        "description": "Connectez-vous avec votre compte Mi Home. La carte est téléchargée depuis le cloud Xiaomi.",
+        "data": {
+          "username": "Identifiant (e-mail, téléphone ou ID utilisateur)",
+          "password": "Mot de passe",
+          "server": "Serveur"
+        }
+      },
+      "captcha": {
+        "title": "Captcha",
+        "description": "Xiaomi demande un captcha. Recopiez les caractères de l'image.\n\n![Captcha](data:image/png;base64,{captcha_image})",
+        "data": {
+          "code": "Code du captcha"
+        }
+      },
+      "two_factor": {
+        "title": "Vérification en deux étapes",
+        "description": "Xiaomi a envoyé un code de vérification par e-mail. Si vous ne recevez rien, ouvrez {url} dans un navigateur, validez la vérification puis réessayez.",
+        "data": {
+          "code": "Code de vérification"
+        }
+      },
+      "device": {
+        "title": "Choix du robot",
+        "description": "Sélectionnez l'aspirateur robot. Les commandes sont envoyées en local quand l'adresse IP et le token sont connus, la carte elle-même est toujours téléchargée depuis le cloud.",
+        "data": {
+          "device_id": "Robot",
+          "host": "Adresse IP locale (facultatif, récupérée du cloud si vide)",
+          "use_local": "Envoyer les commandes en local si possible"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Nouvelle authentification",
+        "description": "Saisissez à nouveau le mot de passe de {username}.",
+        "data": {
+          "password": "Mot de passe"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Identifiant ou mot de passe invalide",
+      "cannot_connect": "Impossible de joindre le cloud Xiaomi",
+      "invalid_captcha": "Captcha incorrect, réessayez",
+      "invalid_code": "Code de vérification invalide ou expiré",
+      "unknown": "Erreur inattendue, consultez les journaux"
+    },
+    "abort": {
+      "already_configured": "Ce robot est déjà configuré",
+      "no_devices": "Aucun aspirateur robot pris en charge sur ce compte",
+      "cannot_connect": "Impossible de joindre le cloud Xiaomi",
+      "reauth_successful": "Nouvelle authentification réussie"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options de la carte",
+        "data": {
+          "refresh_seconds": "Intervalle de rafraîchissement",
+          "scale": "Échelle de l'image",
+          "rotate": "Rotation de l'image",
+          "use_local": "Envoyer les commandes en local si possible",
+          "api": "API du constructeur"
+        }
+      }
+    }
+  },
+  "selector": {
+    "server": {
+      "options": {
+        "auto": "Automatique (tous les serveurs)",
+        "cn": "Chine (cn)",
+        "de": "Europe (de)",
+        "us": "États-Unis (us)",
+        "ru": "Russie (ru)",
+        "tw": "Taïwan (tw)",
+        "sg": "Singapour (sg)",
+        "in": "Inde (in)",
+        "i2": "Inde 2 (i2)"
+      }
+    },
+    "api": {
+      "options": {
+        "auto": "Automatique (selon le modèle)",
+        "roborock": "Roborock / Mi Robot",
+        "dreame": "Dreame",
+        "viomi": "Viomi",
+        "roidmi": "Roidmi",
+        "ijai": "Ijai",
+        "xiaomi": "Xiaomi (xiaomi.vacuum.*)"
+      }
+    }
+  },
+  "entity": {
+    "camera": {
+      "map": {
+        "name": "Carte"
+      }
+    },
+    "image": {
+      "map": {
+        "name": "Carte"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Actualiser la carte"
+      }
+    }
+  }
+}
