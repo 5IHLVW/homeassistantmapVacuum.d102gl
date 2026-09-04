@@ -11,7 +11,7 @@ Entités créées :
 ## Installation via HACS
 
 1. Dans HACS, ouvrez le menu (trois points en haut à droite) puis **Dépôts personnalisés**.
-2. Ajoutez `https://github.com/VOTRE_COMPTE/homeassistantmapVacuum.d102gl` avec la catégorie **Intégration**.
+2. Ajoutez `https://github.com/5IHLVW/homeassistantmapVacuum.d102gl` avec la catégorie **Intégration**.
 3. Installez **Home Assistant Map Vacuum d102gl** puis redémarrez Home Assistant.
 
 Installation manuelle : copiez le dossier `custom_components/map_vacuum_d102gl` dans le dossier `custom_components` de votre configuration Home Assistant, puis redémarrez.
@@ -57,7 +57,7 @@ camera_view: live
 3. Récupération de l'URL signée de la carte et téléchargement.
 4. Décodage avec les bibliothèques `vacuum-map-parser-*` (celles de *Xiaomi Cloud Map Extractor*).
 
-Le code du cœur (`custom_components/map_vacuum_d102gl/core/`) est partagé avec l'application autonome [xiaomi-vacuum-map](https://github.com/VOTRE_COMPTE/xiaomi-vacuum-map), utilisable sans Home Assistant.
+Le code du cœur (`custom_components/map_vacuum_d102gl/core/`) est partagé avec l'application autonome [xiaomi-vacuum-map](https://github.com/5IHLVW/xiaomi-vacuum-map), utilisable sans Home Assistant.
 
 ## Publication sur le dépôt HACS par défaut
 

@@ -4,10 +4,10 @@
   "codeowners": [],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/VOTRE_COMPTE/homeassistantmapVacuum.d102gl",
+  "documentation": "https://github.com/5IHLVW/homeassistantmapVacuum.d102gl",
   "integration_type": "device",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/VOTRE_COMPTE/homeassistantmapVacuum.d102gl/issues",
+  "issue_tracker": "https://github.com/5IHLVW/homeassistantmapVacuum.d102gl/issues",
   "requirements": [
     "pycryptodome>=3.19",
     "vacuum-map-parser-base==0.1.5",
@@ -18,5 +18,5 @@
     "vacuum-map-parser-ijai==0.1.1",
     "vacuum-map-parser-xiaomi==0.1.4"
   ],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
