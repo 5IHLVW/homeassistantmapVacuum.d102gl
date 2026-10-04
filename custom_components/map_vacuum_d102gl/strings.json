@@ -123,5 +123,57 @@
         "name": "Refresh map"
       }
     }
+  },
+  "services": {
+    "read_rooms": {
+      "name": "Read rooms",
+      "description": "Reads the rooms (room-information), the current map and the map backup list from the robot. Read-only.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Robot",
+          "description": "Only needed when several robots are configured."
+        }
+      }
+    },
+    "merge_rooms": {
+      "name": "Merge rooms (experimental)",
+      "description": "Asks the robot to merge adjacent rooms. Format not documented by Xiaomi: back up the map first.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Robot",
+          "description": "Only needed when several robots are configured."
+        },
+        "rooms": {
+          "name": "Rooms",
+          "description": "Room numbers to merge, e.g. [10, 11]."
+        },
+        "params": {
+          "name": "Raw parameter",
+          "description": "Text sent as-is to the robot. For merging, replaces the default {\"room\":[...]} format."
+        },
+        "confirm": {
+          "name": "I backed up the map",
+          "description": "Must be enabled: the command changes the map stored in the robot."
+        }
+      }
+    },
+    "split_room": {
+      "name": "Split a room (experimental)",
+      "description": "Sends the split-room command with the raw parameter given. Format not documented by Xiaomi: back up the map first.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Robot",
+          "description": "Only needed when several robots are configured."
+        },
+        "params": {
+          "name": "Raw parameter",
+          "description": "Text sent as-is to the robot. For merging, replaces the default {\"room\":[...]} format."
+        },
+        "confirm": {
+          "name": "I backed up the map",
+          "description": "Must be enabled: the command changes the map stored in the robot."
+        }
+      }
+    }
   }
 }

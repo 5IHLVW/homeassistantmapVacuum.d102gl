@@ -84,6 +84,29 @@ _XIAOMI_MAP_PROP_OVERRIDES: list[tuple[list[str], tuple[int, int]]] = [
 ]
 
 
+@dataclass(frozen=True)
+class RoomEditSpec:
+    """Numéros MIoT (siid, piid / aiid) des commandes d'édition des pièces d'un modèle."""
+
+    room_information: tuple[int, int]
+    current_map_id: tuple[int, int]
+    backup_map_list: tuple[int, int]
+    merge_rooms: tuple[int, int, int]  # siid, aiid, piid du paramètre (vacuum-room-ids)
+    split_room: tuple[int, int, int]  # siid, aiid, piid du paramètre (common-params)
+
+
+# D'après https://miot-spec.org (urn:miot-spec-v2:device:vacuum:0000A006:xiaomi-d102gl:1).
+ROOM_EDIT_SPECS: dict[str, RoomEditSpec] = {
+    "xiaomi.vacuum.d102gl": RoomEditSpec(
+        room_information=(2, 16),
+        current_map_id=(10, 6),
+        backup_map_list=(10, 13),
+        merge_rooms=(2, 15, 15),
+        split_room=(2, 14, 24),
+    ),
+}
+
+
 def detect_api(model: str) -> VacuumApi:
     """Déduit l'API (constructeur) à partir du nom de modèle."""
     if model in API_EXCEPTIONS:
@@ -271,6 +294,51 @@ class VacuumMapService:
 
     def call_action(self, siid: int, aiid: int, params: list | None = None) -> Any:
         return self.command("action", {"did": self.device.did, "siid": siid, "aiid": aiid, "in": params or []})
+
+    # ------------------------------------------------------------------ édition des pièces
+    # Expérimental : le format des paramètres n'est pas documenté par Xiaomi. Chaque fonction
+    # renvoie la commande envoyée et la réponse brute du robot pour pouvoir vérifier.
+    def _room_edit_spec(self) -> RoomEditSpec:
+        spec = ROOM_EDIT_SPECS.get(self.device.model)
+        if spec is None:
+            raise MapError(f"Édition des pièces non prise en charge pour {self.device.model}")
+        return spec
+
+    def read_room_information(self) -> dict[str, Any]:
+        """Lit les pièces, la carte courante et les sauvegardes de carte (lecture seule)."""
+        spec = self._room_edit_spec()
+        result: dict[str, Any] = {}
+        for key, (siid, piid) in (
+            ("room_information", spec.room_information),
+            ("current_map_id", spec.current_map_id),
+            ("backup_map_list", spec.backup_map_list),
+        ):
+            try:
+                value = self.get_property(siid, piid)
+            except (MiioError, XiaomiCloudError) as exc:
+                value = f"erreur: {exc}"
+            result[key] = value
+            if isinstance(value, str):
+                try:
+                    result[f"{key}_json"] = json.loads(value)
+                except ValueError:
+                    pass
+        return result
+
+    def _room_edit_action(self, siid: int, aiid: int, piid: int, value: str) -> dict[str, Any]:
+        sent = {"siid": siid, "aiid": aiid, "in": [{"piid": piid, "value": value}]}
+        _LOGGER.warning("Édition des pièces : envoi de %s", sent)
+        response = self.call_action(siid, aiid, sent["in"])
+        _LOGGER.warning("Édition des pièces : réponse du robot %s", response)
+        return {"sent": sent, "response": _json_safe(response)}
+
+    def merge_rooms(self, value: str) -> dict[str, Any]:
+        siid, aiid, piid = self._room_edit_spec().merge_rooms
+        return self._room_edit_action(siid, aiid, piid, value)
+
+    def split_room(self, value: str) -> dict[str, Any]:
+        siid, aiid, piid = self._room_edit_spec().split_room
+        return self._room_edit_action(siid, aiid, piid, value)
 
     # ------------------------------------------------------------------ nom de carte
     def get_map_name(self) -> str:

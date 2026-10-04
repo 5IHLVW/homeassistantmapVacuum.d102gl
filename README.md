@@ -52,6 +52,16 @@ entity: camera.oscar_wipe_carte
 camera_view: live
 ```
 
+## Diviser et fusionner les pièces (expérimental, xiaomi.vacuum.d102gl)
+
+Trois actions, dans **Outils de développement → Actions** :
+
+- `map_vacuum_d102gl.read_rooms` : lit les pièces telles que le robot les enregistre, la carte courante et les sauvegardes de carte. Lecture seule, sans risque.
+- `map_vacuum_d102gl.merge_rooms` : fusionne des pièces voisines (`rooms: [10, 11]`).
+- `map_vacuum_d102gl.split_room` : divise une pièce, avec le paramètre brut `params`.
+
+Xiaomi ne documente pas le format de ces commandes : chaque action renvoie ce qui a été envoyé et la réponse exacte du robot, aussi écrites dans le journal. **Sauvegardez la carte dans l'app Xiaomi Home avant tout essai** ; les actions qui modifient la carte refusent de s'exécuter tant que `confirm` n'est pas à `true`.
+
 ## Fonctionnement
 
 1. Connexion au compte Xiaomi (algorithme de *Xiaomi Cloud Tokens Extractor*).

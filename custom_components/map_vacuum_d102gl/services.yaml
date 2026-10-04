@@ -1,0 +1,48 @@
+read_rooms:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: map_vacuum_d102gl
+
+merge_rooms:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: map_vacuum_d102gl
+    rooms:
+      required: true
+      example: "[10, 11]"
+      selector:
+        object:
+    params:
+      required: false
+      example: '{"room":[10,11]}'
+      selector:
+        text:
+    confirm:
+      required: true
+      default: false
+      selector:
+        boolean:
+
+split_room:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: map_vacuum_d102gl
+    params:
+      required: true
+      selector:
+        text:
+          multiline: true
+    confirm:
+      required: true
+      default: false
+      selector:
+        boolean:

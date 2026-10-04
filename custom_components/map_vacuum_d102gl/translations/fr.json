@@ -123,5 +123,57 @@
         "name": "Actualiser la carte"
       }
     }
+  },
+  "services": {
+    "read_rooms": {
+      "name": "Lire les pièces",
+      "description": "Lit sur le robot les pièces (room-information), la carte courante et la liste des sauvegardes de carte. Lecture seule, sans risque.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Robot",
+          "description": "Seulement si plusieurs robots sont configurés."
+        }
+      }
+    },
+    "merge_rooms": {
+      "name": "Fusionner des pièces (expérimental)",
+      "description": "Demande au robot de fusionner des pièces voisines. Format non documenté par Xiaomi : sauvegardez la carte avant.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Robot",
+          "description": "Seulement si plusieurs robots sont configurés."
+        },
+        "rooms": {
+          "name": "Pièces",
+          "description": "Numéros des pièces à fusionner, par exemple [10, 11]."
+        },
+        "params": {
+          "name": "Paramètre brut",
+          "description": "Texte envoyé tel quel au robot. Pour la fusion, remplace le format par défaut {\"room\":[...]}."
+        },
+        "confirm": {
+          "name": "J'ai sauvegardé la carte",
+          "description": "Doit être activé : la commande modifie la carte enregistrée dans le robot."
+        }
+      }
+    },
+    "split_room": {
+      "name": "Diviser une pièce (expérimental)",
+      "description": "Envoie au robot la commande split-room avec le paramètre brut fourni. Format non documenté par Xiaomi : sauvegardez la carte avant.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Robot",
+          "description": "Seulement si plusieurs robots sont configurés."
+        },
+        "params": {
+          "name": "Paramètre brut",
+          "description": "Texte envoyé tel quel au robot. Pour la fusion, remplace le format par défaut {\"room\":[...]}."
+        },
+        "confirm": {
+          "name": "J'ai sauvegardé la carte",
+          "description": "Doit être activé : la commande modifie la carte enregistrée dans le robot."
+        }
+      }
+    }
   }
 }
