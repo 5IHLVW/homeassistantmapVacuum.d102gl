@@ -13,6 +13,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
     BooleanSelector,
+    ColorRGBSelector,
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
@@ -28,22 +29,28 @@ from homeassistant.helpers.selector import (
 from .const import (
     APIS,
     CONF_API,
+    CONF_BACKGROUND,
     CONF_CODE,
     CONF_DEVICE_ID,
     CONF_DEVICE_INFO,
     CONF_HOST,
     CONF_REFRESH_SECONDS,
+    CONF_ROOM_BORDERS,
+    CONF_ROOM_COLORS,
     CONF_ROTATE,
     CONF_SCALE,
     CONF_SERVER,
     CONF_SESSION,
+    CONF_THEME,
     CONF_TOKEN,
     CONF_USE_LOCAL,
     DEFAULT_REFRESH_SECONDS,
     DEFAULT_ROTATE,
     DEFAULT_SCALE,
+    DEFAULT_THEME,
     DOMAIN,
     SERVER_AUTO,
+    THEMES,
     SERVERS,
 )
 from .coordinator import session_store
@@ -223,6 +230,8 @@ class MapVacuumConfigFlow(ConfigFlow, domain=DOMAIN):
                 CONF_SCALE: DEFAULT_SCALE,
                 CONF_ROTATE: DEFAULT_ROTATE,
                 CONF_API: "auto",
+                CONF_THEME: DEFAULT_THEME,
+                CONF_ROOM_BORDERS: True,
             }
             return self.async_create_entry(title=device.name or device.model, data=data, options=options)
 
@@ -266,7 +275,7 @@ class MapVacuumConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class MapVacuumOptionsFlow(OptionsFlow):
-    """Options : intervalle, échelle, rotation, accès local, API."""
+    """Options : intervalle, échelle, rotation, couleurs, accès local, API."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
@@ -284,6 +293,12 @@ class MapVacuumOptionsFlow(OptionsFlow):
                 vol.Required(CONF_ROTATE, default=current.get(CONF_ROTATE, DEFAULT_ROTATE)): NumberSelector(
                     NumberSelectorConfig(min=0, max=359, step=1, mode=NumberSelectorMode.BOX, unit_of_measurement="°")
                 ),
+                vol.Required(CONF_THEME, default=current.get(CONF_THEME, DEFAULT_THEME)): SelectSelector(
+                    SelectSelectorConfig(options=THEMES, mode=SelectSelectorMode.DROPDOWN, translation_key="theme")
+                ),
+                vol.Optional(CONF_BACKGROUND, description={"suggested_value": current.get(CONF_BACKGROUND)}): ColorRGBSelector(),
+                vol.Required(CONF_ROOM_BORDERS, default=current.get(CONF_ROOM_BORDERS, True)): BooleanSelector(),
+                vol.Optional(CONF_ROOM_COLORS, description={"suggested_value": current.get(CONF_ROOM_COLORS)}): TextSelector(),
                 vol.Required(CONF_USE_LOCAL, default=current.get(CONF_USE_LOCAL, True)): BooleanSelector(),
                 vol.Required(CONF_API, default=current.get(CONF_API, "auto")): SelectSelector(
                     SelectSelectorConfig(options=APIS, mode=SelectSelectorMode.DROPDOWN, translation_key="api")

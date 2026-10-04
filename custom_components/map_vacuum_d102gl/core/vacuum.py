@@ -12,7 +12,6 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from vacuum_map_parser_base.config.color import ColorsPalette
 from vacuum_map_parser_base.config.drawable import Drawable
 from vacuum_map_parser_base.config.image_config import ImageConfig
 from vacuum_map_parser_base.config.size import Sizes
@@ -20,6 +19,7 @@ from vacuum_map_parser_base.map_data import MapData
 from vacuum_map_parser_base.map_data_parser import MapDataParser
 
 from .miio_local import MiioDevice, MiioError
+from .style import MapStyle
 from .xiaomi_cloud import DeviceInfo, RpcError, SessionExpired, XiaomiCloudConnector, XiaomiCloudError, extract
 
 _LOGGER = logging.getLogger(__name__)
@@ -168,6 +168,7 @@ class VacuumMapService:
         rotate: float = 0.0,
         drawables: list[Drawable] | None = None,
         use_local: bool = True,
+        style: MapStyle | None = None,
     ) -> None:
         self.cloud = cloud
         self.device = device
@@ -192,6 +193,7 @@ class VacuumMapService:
         self.scale = scale
         self.rotate = rotate
         self.drawables = list(Drawable) if drawables is None else drawables
+        self.style = style or MapStyle()
         self._parser = self._build_parser()
         _LOGGER.info(
             "Robot %s (%s) - API %s - accès local %s",
@@ -203,7 +205,12 @@ class VacuumMapService:
 
     # ------------------------------------------------------------------ parseur
     def _build_parser(self) -> MapDataParser:
-        palette = ColorsPalette()
+        parser = self._create_parser()
+        self.style.apply(parser, self.scale)
+        return parser
+
+    def _create_parser(self) -> MapDataParser:
+        palette = self.style.palette
         sizes = Sizes()
         image_config = ImageConfig(scale=self.scale, rotate=self.rotate)
         texts: list = []

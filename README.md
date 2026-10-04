@@ -24,7 +24,9 @@ Installation manuelle : copiez le dossier `custom_components/map_vacuum_d102gl` 
 2. Si Xiaomi le demande : captcha (affiché dans le formulaire) puis code de vérification reçu par e-mail.
 3. Choix du robot dans la liste du compte. Le token et l'adresse IP sont récupérés automatiquement depuis le cloud.
 
-Options (icône **Configurer** sur l'intégration) : intervalle de rafraîchissement, échelle et rotation de l'image, envoi des commandes en local, API du constructeur.
+Options (icône **Configurer** sur l'intégration) : intervalle de rafraîchissement, échelle et rotation de l'image, couleurs de la carte, envoi des commandes en local, API du constructeur.
+
+Couleurs : thème **Clair** (fond blanc, pièces pastel, par défaut), **Contraste** (fond blanc, couleurs franches) ou **Original** (fond bleu). Vous pouvez aussi choisir la couleur du fond, tracer ou non un trait entre les pièces, et imposer vos propres couleurs de pièces (`#F4A9A3 #A7C8F2 ...`, dans l'ordre des numéros de pièce).
 
 La session cloud est conservée dans `.storage/`, il n'est donc pas nécessaire de refaire le captcha à chaque redémarrage. Si elle expire, Home Assistant propose une nouvelle authentification.
 

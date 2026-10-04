@@ -63,9 +63,14 @@
           "refresh_seconds": "Refresh interval",
           "scale": "Image scale",
           "rotate": "Image rotation",
+          "theme": "Map colors",
+          "background": "Background color (empty = white)",
+          "room_borders": "Separator line between rooms",
+          "room_colors": "Room colors (optional, e.g. #F4A9A3 #A7C8F2 #BFE3A1)",
           "use_local": "Send commands locally when possible",
           "api": "Vendor API"
-        }
+        },
+        "description": "Room colors are assigned in room number order. Leave empty to use the theme colors."
       }
     }
   },
@@ -92,6 +97,13 @@
         "roidmi": "Roidmi",
         "ijai": "Ijai",
         "xiaomi": "Xiaomi (xiaomi.vacuum.*)"
+      }
+    },
+    "theme": {
+      "options": {
+        "clair": "Light: white background, pastel rooms",
+        "contraste": "Contrast: white background, bold colors",
+        "original": "Original: blue background"
       }
     }
   },

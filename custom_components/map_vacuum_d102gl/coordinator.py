@@ -16,22 +16,28 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .const import (
     CONF_API,
+    CONF_BACKGROUND,
     CONF_DEVICE_ID,
     CONF_DEVICE_INFO,
     CONF_HOST,
     CONF_REFRESH_SECONDS,
+    CONF_ROOM_BORDERS,
+    CONF_ROOM_COLORS,
     CONF_ROTATE,
     CONF_SCALE,
     CONF_SERVER,
     CONF_SESSION,
+    CONF_THEME,
     CONF_TOKEN,
     CONF_USE_LOCAL,
     DEFAULT_REFRESH_SECONDS,
     DEFAULT_ROTATE,
     DEFAULT_SCALE,
+    DEFAULT_THEME,
     DOMAIN,
     STORAGE_VERSION,
 )
+from .core.style import MapStyle
 from .core.vacuum import MapError, MapSnapshot, VacuumMapService
 from .core.xiaomi_cloud import DeviceInfo, LoginError, XiaomiCloudConnector, XiaomiCloudError
 
@@ -89,6 +95,12 @@ class MapVacuumCoordinator(DataUpdateCoordinator[MapSnapshot]):
                 scale=float(options.get(CONF_SCALE, DEFAULT_SCALE)),
                 rotate=float(options.get(CONF_ROTATE, DEFAULT_ROTATE)),
                 use_local=bool(options.get(CONF_USE_LOCAL, True)),
+                style=MapStyle(
+                    options.get(CONF_THEME, DEFAULT_THEME),
+                    background=options.get(CONF_BACKGROUND),
+                    room_colors=options.get(CONF_ROOM_COLORS),
+                    room_borders=bool(options.get(CONF_ROOM_BORDERS, True)),
+                ),
             )
             return connector, device, service
 

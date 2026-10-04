@@ -18,13 +18,19 @@ CONF_SCALE = "scale"
 CONF_ROTATE = "rotate"
 CONF_USE_LOCAL = "use_local"
 CONF_API = "api"
+CONF_THEME = "theme"
+CONF_BACKGROUND = "background"
+CONF_ROOM_COLORS = "room_colors"
+CONF_ROOM_BORDERS = "room_borders"
 
 DEFAULT_REFRESH_SECONDS = 30
 DEFAULT_SCALE = 3.0
 DEFAULT_ROTATE = 0.0
+DEFAULT_THEME = "clair"
 
 SERVER_AUTO = "auto"
 SERVERS = [SERVER_AUTO, "cn", "de", "us", "ru", "tw", "sg", "in", "i2"]
+THEMES = ["clair", "contraste", "original"]
 APIS = ["auto", "roborock", "dreame", "viomi", "roidmi", "ijai", "xiaomi"]
 
 STORAGE_VERSION = 1

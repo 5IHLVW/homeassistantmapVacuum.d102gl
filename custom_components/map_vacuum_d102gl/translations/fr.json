@@ -63,9 +63,14 @@
           "refresh_seconds": "Intervalle de rafraîchissement",
           "scale": "Échelle de l'image",
           "rotate": "Rotation de l'image",
+          "theme": "Couleurs de la carte",
+          "background": "Couleur du fond (vide = blanc)",
+          "room_borders": "Trait de séparation entre les pièces",
+          "room_colors": "Couleurs des pièces (facultatif, ex. #F4A9A3 #A7C8F2 #BFE3A1)",
           "use_local": "Envoyer les commandes en local si possible",
           "api": "API du constructeur"
-        }
+        },
+        "description": "Les couleurs des pièces sont attribuées dans l'ordre des numéros de pièce. Laissez le champ vide pour utiliser celles du thème."
       }
     }
   },
@@ -92,6 +97,13 @@
         "roidmi": "Roidmi",
         "ijai": "Ijai",
         "xiaomi": "Xiaomi (xiaomi.vacuum.*)"
+      }
+    },
+    "theme": {
+      "options": {
+        "clair": "Clair : fond blanc, pièces pastel",
+        "contraste": "Contraste : fond blanc, couleurs franches",
+        "original": "Original : fond bleu"
       }
     }
   },
