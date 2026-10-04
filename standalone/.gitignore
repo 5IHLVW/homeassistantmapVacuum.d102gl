@@ -1,0 +1,20 @@
+# Secrets et session
+.env
+.xiaomi_session.json
+captcha.png
+
+# Cartes générées
+maps/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/

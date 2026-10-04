@@ -1,1 +1,1 @@
-"""Cœur partagé avec le projet autonome xiaomi-vacuum-map (client cloud, miIO local, décodage)."""
+"""Cœur partagé avec l'application autonome du dossier standalone/ (client cloud, miIO local, décodage)."""

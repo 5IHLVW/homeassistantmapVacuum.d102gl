@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carte - {{ device.name or device.model }}</title>
+  <style>
+    :root {
+      --bg: #f5f6f8; --panel: #ffffff; --border: #e2e5ea; --text: #1f2933; --muted: #6b7280;
+      --accent: #2563eb; --ok: #16a34a; --err: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1.25rem; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    header h1 { font-size: 1.1rem; margin: 0; font-weight: 600; }
+    header .sub { color: var(--muted); font-size: .85rem; }
+    .actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    button { background: var(--accent); color: #ffffff; border: 0; border-radius: 6px; padding: .5rem .9rem; font-weight: 600; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: wait; }
+    button.secondary { background: var(--border); color: var(--text); }
+    main { display: grid; grid-template-columns: 1fr 320px; gap: 1rem; padding: 1rem; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    .map-box { background: #ffffff; border: 1px solid var(--border); border-radius: 10px; padding: .75rem; min-height: 60vh; display: flex; align-items: center; justify-content: center; overflow: auto; }
+    .map-box img { max-width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 6px; transition: transform .15s; transform-origin: center; }
+    .placeholder { color: var(--muted); text-align: center; padding: 2rem; }
+    aside { display: flex; flex-direction: column; gap: 1rem; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1rem; }
+    .card h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 .6rem; }
+    dl { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; margin: 0; font-size: .9rem; }
+    dt { color: var(--muted); }
+    dd { margin: 0; word-break: break-all; }
+    .status { display: inline-flex; align-items: center; gap: .4rem; font-size: .85rem; }
+    .dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--muted); }
+    .dot.ok { background: var(--ok); } .dot.err { background: var(--err); } .dot.busy { background: var(--accent); animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { opacity: .3; } }
+    .error { color: var(--err); font-size: .85rem; white-space: pre-wrap; }
+    ul.rooms { list-style: none; padding: 0; margin: 0; font-size: .9rem; }
+    ul.rooms li { display: flex; justify-content: space-between; padding: .25rem 0; border-bottom: 1px solid var(--border); }
+    ul.rooms li:last-child { border-bottom: 0; }
+    .tag { font-size: .75rem; color: var(--muted); }
+    .tag.here { color: var(--ok); }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>{{ device.name or "Aspirateur robot" }}</h1>
+      <div class="sub">{{ device.model }} &middot; API {{ api }} &middot; serveur {{ device.server }}</div>
+    </div>
+    <div class="actions">
+      <span class="status"><span id="dot" class="dot"></span><span id="status-text">En attente...</span></span>
+      <button id="zoom-out" class="secondary" title="Zoom arrière">&minus;</button>
+      <button id="zoom-in" class="secondary" title="Zoom avant">+</button>
+      <button id="refresh">Actualiser</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="map-box" id="map-box">
+      <div class="placeholder" id="placeholder">Récupération de la carte en cours...<br><small>Rafraîchissement automatique toutes les {{ refresh_seconds }} s.</small></div>
+      <img id="map" alt="Carte de l'aspirateur" hidden>
+    </div>
+
+    <aside>
+      <div class="card">
+        <h2>Carte</h2>
+        <dl>
+          <dt>Dernière mise à jour</dt><dd id="last-update">-</dd>
+          <dt>Nom de carte</dt><dd id="map-name">-</dd>
+          <dt>Taille</dt><dd id="map-size">-</dd>
+          <dt>Robot</dt><dd id="vacuum-pos">-</dd>
+          <dt>Pièce actuelle</dt><dd id="vacuum-room">-</dd>
+          <dt>Base</dt><dd id="charger-pos">-</dd>
+        </dl>
+        <div class="error" id="error" hidden></div>
+      </div>
+
+      <div class="card">
+        <h2>Pièces</h2>
+        <ul class="rooms" id="rooms"><li><span class="tag">Aucune information</span></li></ul>
+      </div>
+
+      <div class="card">
+        <h2>Liens</h2>
+        <dl>
+          <dt>Image</dt><dd><a href="/map.png" target="_blank">/map.png</a></dd>
+          <dt>JSON</dt><dd><a href="/api/map" target="_blank">/api/map</a></dd>
+          <dt>État</dt><dd><a href="/api/status" target="_blank">/api/status</a></dd>
+          <dt>Brut</dt><dd><a href="/map.raw">/map.raw</a></dd>
+        </dl>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const img = document.getElementById('map');
+    const placeholder = document.getElementById('placeholder');
+    const dot = document.getElementById('dot');
+    const statusText = document.getElementById('status-text');
+    const errorBox = document.getElementById('error');
+    const refreshBtn = document.getElementById('refresh');
+    let lastUpdate = null;
+    let zoom = 1;
+
+    const fmtPoint = p => p ? `x ${Math.round(p.x)}, y ${Math.round(p.y)}` + (p.a != null ? `, ${Math.round(p.a)}°` : '') : '-';
+    const fmtDate = iso => iso ? new Date(iso).toLocaleString('fr-FR') : '-';
+
+    function applyZoom() { img.style.transform = `scale(${zoom})`; }
+    document.getElementById('zoom-in').onclick = () => { zoom = Math.min(zoom * 1.25, 6); applyZoom(); };
+    document.getElementById('zoom-out').onclick = () => { zoom = Math.max(zoom / 1.25, 0.25); applyZoom(); };
+
+    function render(status) {
+      const map = status.map;
+      if (status.refreshing) { dot.className = 'dot busy'; statusText.textContent = 'Mise à jour...'; }
+      else if (status.error) { dot.className = 'dot err'; statusText.textContent = 'Erreur'; }
+      else if (map) { dot.className = 'dot ok'; statusText.textContent = 'À jour'; }
+      else { dot.className = 'dot'; statusText.textContent = 'En attente...'; }
+
+      errorBox.hidden = !status.error;
+      errorBox.textContent = status.error || '';
+
+      if (map) {
+        if (status.last_update !== lastUpdate) {
+          lastUpdate = status.last_update;
+          img.src = '/map.png?t=' + encodeURIComponent(lastUpdate);
+          img.hidden = false;
+          placeholder.hidden = true;
+        }
+        document.getElementById('last-update').textContent = fmtDate(status.last_update);
+        document.getElementById('map-name').textContent = map.map_name || '-';
+        document.getElementById('map-size').textContent = map.image ? `${map.image.width} × ${map.image.height} px (échelle ${map.image.scale})` : '-';
+        document.getElementById('vacuum-pos').textContent = fmtPoint(map.vacuum_position);
+        document.getElementById('vacuum-room').textContent = map.vacuum_room_name || (map.vacuum_room != null ? `#${map.vacuum_room}` : '-');
+        document.getElementById('charger-pos').textContent = fmtPoint(map.charger);
+
+        const rooms = document.getElementById('rooms');
+        rooms.innerHTML = '';
+        if (map.rooms && map.rooms.length) {
+          for (const room of map.rooms) {
+            const li = document.createElement('li');
+            const name = document.createElement('span');
+            name.textContent = room.name || `Pièce ${room.id}`;
+            const tag = document.createElement('span');
+            tag.className = 'tag' + (map.vacuum_room === room.id ? ' here' : '');
+            tag.textContent = map.vacuum_room === room.id ? 'robot ici' : `#${room.id}`;
+            li.append(name, tag);
+            rooms.appendChild(li);
+          }
+        } else {
+          rooms.innerHTML = '<li><span class="tag">Aucune pièce détectée</span></li>';
+        }
+      } else if (status.error) {
+        placeholder.innerHTML = 'Impossible de récupérer la carte.<br><small>Voir le détail à droite. Nouvel essai automatique.</small>';
+      }
+    }
+
+    async function poll() {
+      try {
+        const res = await fetch('/api/status', { cache: 'no-store' });
+        render(await res.json());
+      } catch (e) {
+        dot.className = 'dot err'; statusText.textContent = 'Serveur injoignable';
+      }
+    }
+
+    refreshBtn.onclick = async () => {
+      refreshBtn.disabled = true;
+      try { await fetch('/api/refresh', { method: 'POST' }); } catch (e) {}
+      setTimeout(() => { refreshBtn.disabled = false; poll(); }, 1500);
+    };
+
+    poll();
+    setInterval(poll, 5000);
+  </script>
+</body>
+</html>

@@ -59,7 +59,7 @@ camera_view: live
 3. Récupération de l'URL signée de la carte et téléchargement.
 4. Décodage avec les bibliothèques `vacuum-map-parser-*` (celles de *Xiaomi Cloud Map Extractor*).
 
-Le code du cœur (`custom_components/map_vacuum_d102gl/core/`) est partagé avec l'application autonome [xiaomi-vacuum-map](https://github.com/5IHLVW/xiaomi-vacuum-map), utilisable sans Home Assistant.
+Le code du cœur (`custom_components/map_vacuum_d102gl/core/`) est partagé avec l'application autonome du dossier [`standalone`](standalone/), utilisable sans Home Assistant.
 
 ## Publication sur le dépôt HACS par défaut
 
