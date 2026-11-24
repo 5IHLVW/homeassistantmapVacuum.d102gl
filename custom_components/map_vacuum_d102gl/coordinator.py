@@ -163,4 +163,6 @@ class MapVacuumCoordinator(DataUpdateCoordinator[MapSnapshot]):
             "model": self.device.model,
             "api": self.service.api.value,
             "local_access": self.service.local is not None,
+            # Vector geometry for custom cards (HTTP view, not an attribute -> keeps the state small).
+            "geometry_url": f"/api/{DOMAIN}/geometry/{self.entry.entry_id}" if self.data.geometry else None,
         }
