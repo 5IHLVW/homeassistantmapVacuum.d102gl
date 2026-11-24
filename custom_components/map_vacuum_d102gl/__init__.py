@@ -9,6 +9,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, PLATFORMS
 from .coordinator import MapVacuumCoordinator, session_store
+from .http import MapGeometryView
 from .services import async_register_services
 
 type MapVacuumConfigEntry = ConfigEntry[MapVacuumCoordinator]
@@ -18,6 +19,7 @@ CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async_register_services(hass)
+    hass.http.register_view(MapGeometryView())
     return True
 
 

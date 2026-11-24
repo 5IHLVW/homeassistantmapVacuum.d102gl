@@ -62,6 +62,16 @@ Trois actions, dans **Outils de développement → Actions** :
 
 Xiaomi ne documente pas le format de ces commandes : chaque action renvoie ce qui a été envoyé et la réponse exacte du robot, aussi écrites dans le journal. **Sauvegardez la carte dans l'app Xiaomi Home avant tout essai** ; les actions qui modifient la carte refusent de s'exécuter tant que `confirm` n'est pas à `true`.
 
+## Géométrie vectorielle (pour cartes Lovelace personnalisées)
+
+En plus de l'image PNG, l'intégration calcule une géométrie vectorielle de la carte : contours des pièces, des murs et du sol libre (polygones en mm, axe y vers le haut), trajet du nettoyage, pièce sous le robot et cap du robot.
+
+- L'attribut `geometry_url` de l'entité caméra donne l'adresse, par exemple `/api/map_vacuum_d102gl/geometry/<entry_id>`.
+- Depuis une carte Lovelace : `hass.callApi('GET', 'map_vacuum_d102gl/geometry/<entry_id>')` (authentification Home Assistant).
+- La géométrie n'est pas un attribut d'état, elle ne charge donc ni l'état ni l'historique (recorder).
+
+Champs principaux : `rooms` (`id`, `name`, `area_m2`, `label`, `polygons`), `walls`, `floor`, `path`, `bounds`, `vacuum_position`, `vacuum_room`, `charger`, `no_go_areas`, `virtual_walls`, `cleaned_rooms`, `last_update`.
+
 ## Fonctionnement
 
 1. Connexion au compte Xiaomi (algorithme de *Xiaomi Cloud Tokens Extractor*).

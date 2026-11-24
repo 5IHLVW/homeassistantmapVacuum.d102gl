@@ -6,6 +6,7 @@ import base64
 import io
 import json
 import logging
+import math
 import time
 from dataclasses import dataclass
 from datetime import datetime
@@ -18,6 +19,7 @@ from vacuum_map_parser_base.config.size import Sizes
 from vacuum_map_parser_base.map_data import MapData
 from vacuum_map_parser_base.map_data_parser import MapDataParser
 
+from .geometry import build_geometry
 from .miio_local import MiioDevice, MiioError
 from .style import MapStyle
 from .xiaomi_cloud import DeviceInfo, RpcError, SessionExpired, XiaomiCloudConnector, XiaomiCloudError, extract
@@ -138,6 +140,7 @@ class MapSnapshot:
     image_png: bytes
     map_data: MapData
     raw: bytes
+    geometry: dict[str, Any] | None = None
 
     def summary(self) -> dict[str, Any]:
         md = self.map_data
@@ -154,14 +157,30 @@ class MapSnapshot:
                     "cleaned": bool(md.cleaned_rooms and number in md.cleaned_rooms),
                 }
             )
+        vacuum_room, vacuum_room_name = md.vacuum_room, md.vacuum_room_name
+        if vacuum_room is None and self.geometry and self.geometry.get("vacuum_room") is not None:
+            # The parser leaves vacuum_room empty for the JSON map; look it up by pixel
+            # (room bounding boxes overlap, so a box test picks the wrong room).
+            vacuum_room = self.geometry["vacuum_room"]
+            vacuum_room_name = md.rooms[vacuum_room].name if md.rooms and vacuum_room in md.rooms else None
+        vacuum_position = md.vacuum_position.as_dict() if md.vacuum_position else None
+        charger = md.charger.as_dict() if md.charger else None
+        # The JSON map sends yaw in milliradians, counter-clockwise (1570 = 90 deg).
+        # vacuum-map-parser-xiaomi treats it as centidegrees modulo 180, so the robot
+        # arrow pointed the wrong way. Recompute from the raw value.
+        yaw = (self.geometry or {}).get("yaw") or {}
+        if vacuum_position is not None and isinstance(yaw.get("vacuum"), (int, float)):
+            vacuum_position["a"] = round(math.degrees(yaw["vacuum"] / 1000) % 360, 1)
+        if charger is not None and isinstance(yaw.get("charger"), (int, float)):
+            charger["a"] = round(math.degrees(yaw["charger"] / 1000) % 360, 1)
         return {
             "timestamp": self.timestamp.isoformat(timespec="seconds"),
             "map_name": self.map_name,
             "image": md.image.as_dict() if md.image else None,
-            "vacuum_position": md.vacuum_position.as_dict() if md.vacuum_position else None,
-            "vacuum_room": md.vacuum_room,
-            "vacuum_room_name": md.vacuum_room_name,
-            "charger": md.charger.as_dict() if md.charger else None,
+            "vacuum_position": vacuum_position,
+            "vacuum_room": vacuum_room,
+            "vacuum_room_name": vacuum_room_name,
+            "charger": charger,
             "goto": md.goto.as_dict() if md.goto else None,
             "rooms": rooms,
             "walls": [w.as_list() for w in md.walls or []],
@@ -484,6 +503,11 @@ class VacuumMapService:
                 model=self.device.model.replace("xiaomi", "mi"),
                 device_id=str(self.device.did),
             )
+            # Keep the raw payload for the vector geometry.
+            try:
+                self._last_payload = json.loads(unpacked) if isinstance(unpacked, str) else unpacked
+            except ValueError:
+                self._last_payload = None
             return parser.parse(unpacked)
         return parser.parse(parser.unpack_map(raw))
 
@@ -520,4 +544,13 @@ class VacuumMapService:
         map_data.map_name = map_name
         buffer = io.BytesIO()
         map_data.image.data.save(buffer, format="PNG")
-        return MapSnapshot(datetime.now(), map_name, buffer.getvalue(), map_data, raw)
+        geometry = None
+        payload = getattr(self, "_last_payload", None)
+        if isinstance(payload, dict):
+            try:
+                names = {int(n): r.name or "" for n, r in (map_data.rooms or {}).items()}
+                vp = map_data.vacuum_position
+                geometry = build_geometry(payload, names, (vp.x, vp.y) if vp is not None else None)
+            except Exception:  # noqa: BLE001 - geometry is optional, the map must keep working
+                _LOGGER.exception("Building vector map geometry failed")
+        return MapSnapshot(datetime.now(), map_name, buffer.getvalue(), map_data, raw, geometry)
